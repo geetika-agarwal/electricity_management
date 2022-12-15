@@ -22,26 +22,26 @@ public class Area {
 	
 	@ManyToOne
 	@JoinColumn(name = "city_id")
-	private City cityId;
-	
+	private City city;
 	@OneToMany(targetEntity = Consumer.class, cascade = CascadeType.ALL)
-	private Set<Consumer> consumer_areas = new HashSet<Consumer>();
+	private Set<Consumer> consumers = new HashSet<Consumer>();
 	
-	public Set<Consumer> getConsumer_areas() {
-		return consumer_areas;
+	
+	public Set<Consumer> getConsumers() {
+		return consumers;
 	}
-	public void setConsumer_areas(Set<Consumer> consumer_areas) {
-		this.consumer_areas = consumer_areas;
+	public void setConsumers(Set<Consumer> consumers) {
+		this.consumers = consumers;
 	}
 	public Area() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public Area(int id, String areaName, City cityId) {
+	public Area(int id, String areaName, City city) {
 		super();
 		this.id = id;
 		this.areaName = areaName;
-		this.cityId = cityId;
+		this.city = city;
 	}
 	public int getId() {
 		return id;
@@ -55,15 +55,15 @@ public class Area {
 	public void setAreaName(String areaName) {
 		this.areaName = areaName;
 	}
-	public City getCityId() {
-		return cityId;
+	public City getCity() {
+		return city;
 	}
-	public void setCityId(City cityId) {
-		this.cityId = cityId;
+	public void setCity(City city) {
+		this.city = city;
 	}
 	@Override
 	public String toString() {
-		return "Area [id=" + id + ", areaName=" + areaName + ", cityId=" + cityId + "]";
+		return "Area [id=" + id + ", areaName=" + areaName + ", city=" + city + ", consumers=" + consumers + "]";
 	}
 	
 		

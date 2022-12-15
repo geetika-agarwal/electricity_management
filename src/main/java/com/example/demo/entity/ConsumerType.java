@@ -18,13 +18,13 @@ public class ConsumerType {
 	private double rate;
 	
 	@OneToMany(targetEntity = Consumer.class, cascade = CascadeType.ALL)
-	private Set<Consumer> consumer_types = new HashSet<Consumer>();
+	private Set<Consumer> consumers = new HashSet<Consumer>();
 	
-	public Set<Consumer> getConsumer_types() {
-		return consumer_types;
+	public Set<Consumer> getConsumers() {
+		return consumers;
 	}
-	public void setConsumer_types(Set<Consumer> consumer_types) {
-		this.consumer_types = consumer_types;
+	public void setConsumers(Set<Consumer> consumers) {
+		this.consumers = consumers;
 	}
 	public ConsumerType() {
 		super();
@@ -56,7 +56,8 @@ public class ConsumerType {
 	}
 	@Override
 	public String toString() {
-		return "ConsumerType [id=" + id + ", typeName=" + typeName + ", rate=" + rate + "]";
+		return "ConsumerType [id=" + id + ", typeName=" + typeName + ", rate=" + rate + ", consumers=" + consumers
+				+ "]";
 	}
 	
 }	

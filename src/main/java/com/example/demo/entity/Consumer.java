@@ -1,15 +1,9 @@
 package com.example.demo.entity;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.apache.commons.codec.binary.Hex;
 
 @Entity()
 public class Consumer {
@@ -29,34 +22,36 @@ public class Consumer {
 	
 	@ManyToOne
 	@JoinColumn(name = "area_id")
-	private Area area_id;
+	private Area area;
 	
 	@ManyToOne
-	@JoinColumn(name = "consumer_type_id")
-	private ConsumerType consumer_type_id;
+	@JoinColumn(name = "consumer_type")
+	private ConsumerType consumer_type;
 	private String password;
 	
 	@OneToMany(targetEntity = Bill.class, cascade = CascadeType.ALL)
-	private Set<Bill> consumer_bills = new HashSet<Bill>();
+	private Set<Bill> bills = new HashSet<Bill>();
 	
 	
-	public Set<Bill> getConsumer_bills() {
-		return consumer_bills;
+	public Set<Bill> getBills() {
+		return bills;
 	}
-	public void setConsumer_bills(Set<Bill> consumer_bills) {
-		this.consumer_bills = consumer_bills;
+	public void setConsumer_bills(Set<Bill> bills) {
+		this.bills = bills;
 	}
 	public Consumer() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public Consumer(String email, String name, Area area_id, ConsumerType consumer_type_id, String password) {
+	public Consumer(String email, String name, Area area, ConsumerType consumer_type, String password,
+			Set<Bill> bills) {
 		super();
 		this.email = email;
 		this.name = name;
-		this.area_id = area_id;
-		this.consumer_type_id = consumer_type_id;
-		setPassword(password);
+		this.area = area;
+		this.consumer_type = consumer_type;
+		this.password = password;
+		this.bills = bills;
 	}
 	public String getEmail() {
 		return email;
@@ -70,27 +65,32 @@ public class Consumer {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Area getArea_id() {
-		return area_id;
+	public Area getArea() {
+		return area;
 	}
-	public void setArea_id(Area area_id) {
-		this.area_id = area_id;
+	public void setArea(Area area) {
+		this.area = area;
 	}
-	public ConsumerType getConsumer_type_id() {
-		return consumer_type_id;
+	public ConsumerType getConsumer_type() {
+		return consumer_type;
 	}
-	public void setConsumer_type_id(ConsumerType consumer_type_id) {
-		this.consumer_type_id = consumer_type_id;
+	public void setConsumer_type(ConsumerType consumer_type) {
+		this.consumer_type = consumer_type;
 	}
 	public String getPassword() {
 		return password;
 	}
 	public void setPassword(String password) {
-        this.password = Base64.getEncoder().encodeToString(password.getBytes());
+		this.password = password;
+	}
+	public void setBills(Set<Bill> bills) {
+		this.bills = bills;
 	}
 	@Override
 	public String toString() {
-		return "Consumer [email=" + email + ", name=" + name + ", area_id=" + area_id + ", consumer_type_id="
-				+ consumer_type_id + ", password=" + password + "]";
+		return "Consumer [email=" + email + ", name=" + name + ", area=" + area + ", consumer_type=" + consumer_type
+				+ ", password=" + password + ", bills=" + bills + "]";
 	}
+	
+	
 }

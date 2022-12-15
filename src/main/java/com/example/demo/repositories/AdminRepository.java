@@ -8,6 +8,6 @@ import com.example.demo.entity.Admin;
 
 @Repository
 @Component
-public interface AdminRepositories extends JpaRepository<Admin, String> {
+public interface AdminRepository extends JpaRepository<Admin, String> {
 
 }

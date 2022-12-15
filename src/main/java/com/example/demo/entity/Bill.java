@@ -13,8 +13,8 @@ public class Bill {
 	private int id;
 	
 	@ManyToOne
-	@JoinColumn(name="consumer_id")
-	private Consumer consumerEmail;
+	@JoinColumn(name="consumer")
+	private Consumer consumer;
 	
 	private Date billDate;
 	private int unitsConsumed;
@@ -23,10 +23,10 @@ public class Bill {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public Bill(int id, Consumer consumerEmail, Date billDate, int unitsConsumed, double totalAmount) {
+	public Bill(int id, Consumer consumer, Date billDate, int unitsConsumed, double totalAmount) {
 		super();
 		this.id = id;
-		this.consumerEmail = consumerEmail;
+		this.consumer = consumer;
 		this.billDate = billDate;
 		this.unitsConsumed = unitsConsumed;
 		this.totalAmount = totalAmount;
@@ -37,11 +37,11 @@ public class Bill {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Consumer getConsumerEmail() {
-		return consumerEmail;
+	public Consumer getConsumer() {
+		return consumer;
 	}
-	public void setConsumerEmail(Consumer consumerEmail) {
-		this.consumerEmail = consumerEmail;
+	public void setConsumer(Consumer consumer) {
+		this.consumer = consumer;
 	}
 	public Date getBillDate() {
 		return billDate;
@@ -63,7 +63,7 @@ public class Bill {
 	}
 	@Override
 	public String toString() {
-		return "Bill [id=" + id + ", consumerEmail=" + consumerEmail + ", billDate=" + billDate + ", unitsConsumed="
+		return "Bill [id=" + id + ", consumer=" + consumer + ", billDate=" + billDate + ", unitsConsumed="
 				+ unitsConsumed + ", totalAmount=" + totalAmount + "]";
 	}
 	

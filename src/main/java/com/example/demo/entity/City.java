@@ -17,24 +17,24 @@ public class City {
 	private String name;
 	
 	@OneToMany(targetEntity = Area.class, cascade = CascadeType.ALL)
-	private Set<Area> city_areas = new HashSet<Area>(); 
+	private Set<Area> areas = new HashSet<Area>(); 
 	
-	
-	
-	public Set<Area> getCity_areas() {
-		return city_areas;
+	public Set<Area> getAreas() {
+		return areas;
 	}
-	public void setCity_areas(Set<Area> city_areas) {
-		this.city_areas = city_areas;
+	public void setAreas(Set<Area> areas) {
+		this.areas = areas;
 	}
 	public City() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public City(int id, String name) {
+	
+	public City(int id, String name, Set<Area> areas) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.areas = areas;
 	}
 	public int getId() {
 		return id;
@@ -50,7 +50,7 @@ public class City {
 	}
 	@Override
 	public String toString() {
-		return "City [id=" + id + ", name=" + name + "]";
+		return "City [id=" + id + ", name=" + name + ", areas=" + areas + "]";
 	}
 	
 	
