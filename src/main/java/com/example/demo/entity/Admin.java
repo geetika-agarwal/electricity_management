@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -40,14 +41,7 @@ public class Admin {
 		return password;
 	}
 	public void setPassword(String password) {
-		SecureRandom random = new SecureRandom();
-		byte[] salt = new byte[16];
-		random.nextBytes(salt);
-
-        byte[] hashedBytes = hashPassword(password.toCharArray(), salt, 65536, 128);
-        String hashedString = Hex.encodeHexString(hashedBytes);
-		
-        this.password = hashedString;
+        this.password = Base64.getEncoder().encodeToString(password.getBytes());;
 	}
 	public String getName() {
 		return name;
@@ -59,17 +53,4 @@ public class Admin {
 	public String toString() {
 		return "Admin [email=" + email + ", password=" + password + ", name=" + name + "]";
 	}
-	
-	public static byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
-
-        try {
-            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            PBEKeySpec spec = new PBEKeySpec( password, salt, iterations, keyLength );
-            SecretKey key = skf.generateSecret( spec );
-            byte[] res = key.getEncoded( );
-            return res;
-        } catch ( NoSuchAlgorithmException | InvalidKeySpecException e ) {
-            throw new RuntimeException(e);
-        }
-    }
 }
