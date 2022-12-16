@@ -50,7 +50,7 @@ public class Consumer {
 		this.name = name;
 		this.area = area;
 		this.consumer_type = consumer_type;
-		this.password = password;
+		setPassword(password);
 		this.bills = bills;
 	}
 	public String getEmail() {
@@ -81,7 +81,7 @@ public class Consumer {
 		return password;
 	}
 	public void setPassword(String password) {
-		this.password = password;
+		this.password = Base64.getEncoder().encodeToString(password.getBytes());
 	}
 	public void setBills(Set<Bill> bills) {
 		this.bills = bills;

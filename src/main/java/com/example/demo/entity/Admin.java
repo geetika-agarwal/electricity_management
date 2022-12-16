@@ -41,7 +41,7 @@ public class Admin {
 		return password;
 	}
 	public void setPassword(String password) {
-        this.password = Base64.getEncoder().encodeToString(password.getBytes());;
+        this.password = Base64.getEncoder().encodeToString(password.getBytes());
 	}
 	public String getName() {
 		return name;

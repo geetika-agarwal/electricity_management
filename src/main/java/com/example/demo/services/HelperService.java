@@ -1,6 +1,10 @@
 package com.example.demo.services;
 
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.demo.entity.Helper;
 import com.example.demo.repositories.HelperRepository;
@@ -15,15 +19,15 @@ public class HelperService{
 		helperRepository.save(helper);
 	}
 
-	public void loginHelper(Helper helper) {
-		if(helperRepository.findById(helper.getEmail()) != null) {
-			if(helperRepository.findById(helper.getEmail()).get().getPassword().equals(helper.getPassword())) {
-				System.out.println("Successful Login");
+	public ResponseEntity<String> loginHelper(String email, String password) {
+		if(helperRepository.findById(email).isPresent()) {
+			if(helperRepository.findById(email).get().getPassword().equals(Base64.getEncoder().encodeToString(password.getBytes()))) {
+				return new ResponseEntity("Successful Login", HttpStatus.ACCEPTED);
 			} else {
-				System.out.println("Wrong Password");
+				return new ResponseEntity("Wrong Password", HttpStatus.NOT_FOUND);
 			}
 		} else {
-			System.out.println("Invalid Credentials");
+			return new ResponseEntity("Invalid Credentials", HttpStatus.BAD_REQUEST);
 		}
 	}
 	

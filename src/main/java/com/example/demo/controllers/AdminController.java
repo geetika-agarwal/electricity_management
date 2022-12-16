@@ -7,6 +7,7 @@ import javax.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,7 +40,7 @@ public class AdminController {
 		adminService.addAdmin(admin3);
 	}
 	
-	@GetMapping("/admin/register-consumer")
+	@PutMapping("/admin/register-consumer")
 	public void addConsumer(@RequestBody Consumer consumer) {
 	}
 	
@@ -49,8 +50,8 @@ public class AdminController {
 	}
 	
 	@PutMapping("/admin/add-area")
-	public void addArea(@RequestParam("area_id") Integer area_id, @RequestParam("area_name") String area_name, @RequestParam("city_id") Integer city_id) {
-		adminService.addArea(area_id, area_name, city_id);
+	public ResponseEntity<String> addArea(@RequestParam("area_id") Integer area_id, @RequestParam("area_name") String area_name, @RequestParam("city_id") Integer city_id) {
+		return adminService.addArea(area_id, area_name, city_id);
 	}
 	
 	@GetMapping("/admin/city")
@@ -64,7 +65,27 @@ public class AdminController {
 	}
 	
 	@GetMapping("/admin/area/{city_name}")
-	public ResponseEntity<HashMap<Integer, String>> viewAreaByCityName(@PathParam("city") String cityName) {
-		return adminService.viewAreaByCityName(cityName);
+	public ResponseEntity<HashMap<Integer, String>> viewAreaByCityName(@PathVariable String city_name) {
+		return adminService.viewAreaByCityName(city_name);
+	}
+	
+	@PutMapping("/admin/login") 
+	public ResponseEntity<String> adminLogin(@RequestParam String email, @RequestParam String password){
+		return adminService.loginAdmin(email, password);
+	}
+	
+	@PutMapping("/admin/modify-city")
+	public ResponseEntity<String> modifyCity(@RequestParam String cityName, @RequestParam String newCityName) {
+		return adminService.modifyCity(cityName, newCityName);
+	}
+	
+	@PutMapping("/admin/modify-area")
+	public ResponseEntity<String> modifyAreaName(@RequestParam String areaName, @RequestParam String newAreaName) {
+		return adminService.modifyAreaName(areaName, newAreaName);
+	}
+	
+	@PutMapping("/admin/modify-area-city")
+	public ResponseEntity<String> modifyAreaByCityName(@RequestParam String areaName, @RequestParam String newCityName) {
+		return adminService.modifyAreaByCityName(areaName, newCityName);
 	}
 }

@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,10 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.entity.Admin;
 import com.example.demo.entity.Area;
 import com.example.demo.entity.City;
+import com.example.demo.entity.Helper;
 import com.example.demo.repositories.AdminRepository;
 import com.example.demo.repositories.AreaRepository;
 import com.example.demo.repositories.CityRepository;
@@ -40,12 +43,31 @@ public class AdminService {
 		adminRepository.save(admin);
 	}
 	
-	public void addCity(City city) {
+	public ResponseEntity<String> addCity(City city) {
 		if(cityRepository.existsById(city.getId())) {
-			System.out.println("City with the particular Id already Exists!!!");
+			// Exception 
+			return new ResponseEntity(new Exception("City with the same ID already exists!!!").getMessage(), HttpStatus.BAD_REQUEST);
 		} else {
-			System.out.println("City Added Successfully!!!");
 			cityRepository.save(city);
+			return new ResponseEntity(new Exception("City Added Successfully!!!").getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	public ResponseEntity<String> addArea(int area_id, String area_name, int city_id) {
+		if(areaRepository.existsById(area_id)) {
+			// Exception 
+			System.out.println("Area with the same ID already exists!!!");
+			return new ResponseEntity(new Exception("Area with the same ID already exists!!!").getMessage(), HttpStatus.BAD_REQUEST);
+		}else if(!(cityRepository.findById(city_id).isPresent())) {
+			// Exception 
+			return new ResponseEntity(new Exception("City Not Found").getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		else {
+			City city = getCityById(city_id).get();
+			Area area = new Area(area_id, area_name, city);
+			areaRepository.save(area);
+			System.out.println("Area Added Successfully!!!");
+			return new ResponseEntity(new Exception("Area Added Successfully!!!").getMessage(), HttpStatus.ACCEPTED);
 		}
 	}
 	
@@ -80,6 +102,10 @@ public class AdminService {
 			}
 		}
 		
+		if(city == null) {
+			
+		}
+		
 		for (Area area : areaRepository.findAll()) {
 			HashMap<Integer, String> map = new HashMap<Integer, String>();
 			if(area.getCity().getId() == city.getId()) {
@@ -88,25 +114,90 @@ public class AdminService {
 			}
 		}
 		
-		System.out.println(city);
 		return new ResponseEntity(areas, HttpStatus.ACCEPTED);
 	}
 	
-	public City getCityById(int city_id) {
-		return cityRepository.getOne(city_id);
+	public ResponseEntity<String> loginAdmin(String email, String password) {
+		if(adminRepository.findById(email).isPresent()) {
+			if(adminRepository.findById(email).get().getPassword().equals(Base64.getEncoder().encodeToString(password.getBytes()))) {
+				return new ResponseEntity("Successful Login", HttpStatus.ACCEPTED);
+			} else {
+				return new ResponseEntity("Wrong Password", HttpStatus.NOT_FOUND);
+			}
+		} else {
+			return new ResponseEntity("Invalid Credentials", HttpStatus.BAD_REQUEST);
+		}
 	}
 	
-	public void addArea(int area_id, String area_name, int city_id) {
-		if(areaRepository.existsById(area_id)) {
-			System.out.println("Area with the same ID already exists!!!");
-		}else if(!(cityRepository.findById(city_id).isPresent())) {
-			System.out.println("City Doesn't Exist");
+	public Optional<City> getCityById(int city_id) {
+		return cityRepository.findById(city_id);
+	}
+	
+	public ResponseEntity<String> modifyCity(String cityName, String newCityName) {
+		City city = null;
+		for(City c: cityRepository.findAll()) {
+			if(c.getName().equalsIgnoreCase(cityName)) {
+				city = c;
+				break;
+			}
 		}
-		else {
-			System.out.println("Area Added Successfully!!!");
-			City city = getCityById(city_id);
-			Area area = new Area(area_id, area_name, getCityById(city_id));
-			areaRepository.save(area);
+		
+		if(city == null) {
+			return new ResponseEntity("City with the name not found!!! Please enter Correct City Name", HttpStatus.EXPECTATION_FAILED);
+		} else {
+			city.setName(newCityName);
+			cityRepository.save(city);
+			return new ResponseEntity("City Updated Successfully!!!", HttpStatus.ACCEPTED);
 		}
 	}
+	
+	public ResponseEntity<String> modifyAreaName(String areaName, String newAreaName) {
+		Area area = null;
+		for(Area a: areaRepository.findAll()) {
+			if(a.getAreaName().equalsIgnoreCase(areaName)) {
+				area = a;
+				break;
+			}
+		}
+		
+		if(area == null) {
+			return new ResponseEntity("Area with the name not found!!! Please enter Correct Area Name", HttpStatus.EXPECTATION_FAILED);
+		} else {
+			area.setAreaName(newAreaName);
+			areaRepository.save(area);
+			return new ResponseEntity("Area Name Updated Successfully!!!", HttpStatus.ACCEPTED);
+		}
+	}
+	
+	public ResponseEntity<String> modifyAreaByCityName(String areaName, String newCityName) {
+		City city = null;
+		Area area = null;
+		
+		for(Area a: areaRepository.findAll()) {
+			if(a.getAreaName().equalsIgnoreCase(areaName)) {
+				area = a;
+				break;
+			}
+		}
+		
+		for(City c: cityRepository.findAll()) {
+			if(c.getName().equalsIgnoreCase(newCityName)) {
+				city = c;
+				break;
+			}
+		}
+		
+		if(area == null) {
+			return new ResponseEntity("Area with the name not found!!! Please enter Correct Area Name", HttpStatus.EXPECTATION_FAILED);
+		}
+		
+		if(city == null) {
+			return new ResponseEntity("City with the name not found!!! Please enter Correct City Name", HttpStatus.EXPECTATION_FAILED);
+		}
+		
+		area.setCity(city);
+		areaRepository.save(area);
+		return new ResponseEntity("City Name Updated for that particular Area Name Successfully", HttpStatus.ACCEPTED);
+	}
+	
 }
