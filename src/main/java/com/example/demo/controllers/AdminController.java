@@ -1,8 +1,7 @@
 package com.example.demo.controllers;
 
 import java.util.HashMap;
-
-import javax.websocket.server.PathParam;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Admin;
-import com.example.demo.entity.Area;
 import com.example.demo.entity.City;
 import com.example.demo.entity.Consumer;
-import com.example.demo.repositories.AdminRepository;
-import com.example.demo.repositories.CityRepository;
-import com.example.demo.repositories.ConsumerRepository;
+import com.example.demo.entity.ConsumerType;
+import com.example.demo.entity.Helper;
 import com.example.demo.services.AdminService;
 
 @RestController
@@ -29,6 +26,7 @@ public class AdminController {
 	@Autowired
 	AdminService adminService;
 	
+	// working
 	@GetMapping("/admin/add-admin")
 	public void addAdmin() {
 		Admin admin1 = new Admin("admin1@gmail.com", "admin@1", "Admin 1");
@@ -40,52 +38,111 @@ public class AdminController {
 		adminService.addAdmin(admin3);
 	}
 	
-	@PutMapping("/admin/register-consumer")
-	public void addConsumer(@RequestBody Consumer consumer) {
+	@PutMapping("/admin/add-consumer-type")
+	public void addConsumerType() {
+		ConsumerType ct1 = new ConsumerType(1, "Commercial", 8.24);
+		ConsumerType ct2 = new ConsumerType(2, "Industrial", 9.73);
+		ConsumerType ct3 = new ConsumerType(3, "Domestic", 6.18);
+		
+		adminService.addConsumerType(ct1);
+		adminService.addConsumerType(ct2);
+		adminService.addConsumerType(ct3);
 	}
 	
-	@PutMapping("/admin/add-city")
+	// working
+	@PutMapping("/admin/register-consumer")
+	public ResponseEntity<String> addConsumer(@RequestParam String email, @RequestParam String name, @RequestParam String area_name, @RequestParam String consumer_type_name, @RequestParam String password) {
+		return adminService.addConsumer(email, name, area_name, consumer_type_name, password);
+	}
+	
+	// working
+	@PostMapping("/admin/add-city")
 	public void addCity(@RequestBody City city) {
 		adminService.addCity(city);
 	}
 	
-	@PutMapping("/admin/add-area")
-	public ResponseEntity<String> addArea(@RequestParam("area_id") Integer area_id, @RequestParam("area_name") String area_name, @RequestParam("city_id") Integer city_id) {
-		return adminService.addArea(area_id, area_name, city_id);
+	// working 
+	@PostMapping("/admin/add-area")
+	public ResponseEntity<String> addArea(@RequestParam String area_name, @RequestParam String city_name) {
+		return adminService.addArea(area_name, city_name);
 	}
 	
+	// working
 	@GetMapping("/admin/city")
 	public ResponseEntity<HashMap<Integer, String>> viewCity() {
 		return adminService.viewAllCities();
 	}
 	
+	// working
 	@GetMapping("/admin/area")
 	public ResponseEntity<HashMap<Integer, String>> viewArea() {
 		return adminService.viewAllAreas();
 	}
 	
-	@GetMapping("/admin/area/{city_name}")
-	public ResponseEntity<HashMap<Integer, String>> viewAreaByCityName(@PathVariable String city_name) {
-		return adminService.viewAreaByCityName(city_name);
+	// working
+	@GetMapping("/admin/area-by-city")
+	public ResponseEntity<HashMap<Integer, String>> viewAreaByCityName(@RequestParam String city) {
+		return adminService.viewAreaByCityName(city);
 	}
 	
-	@PutMapping("/admin/login") 
+	// working
+	@GetMapping("/admin/login") 
 	public ResponseEntity<String> adminLogin(@RequestParam String email, @RequestParam String password){
 		return adminService.loginAdmin(email, password);
 	}
 	
+	// working	
 	@PutMapping("/admin/modify-city")
 	public ResponseEntity<String> modifyCity(@RequestParam String cityName, @RequestParam String newCityName) {
 		return adminService.modifyCity(cityName, newCityName);
 	}
 	
+	// working
 	@PutMapping("/admin/modify-area")
 	public ResponseEntity<String> modifyAreaName(@RequestParam String areaName, @RequestParam String newAreaName) {
 		return adminService.modifyAreaName(areaName, newAreaName);
 	}
 	
+	// working
 	@PutMapping("/admin/modify-area-city")
 	public ResponseEntity<String> modifyAreaByCityName(@RequestParam String areaName, @RequestParam String newCityName) {
 		return adminService.modifyAreaByCityName(areaName, newCityName);
 	}
+	
+	// working
+	@PutMapping("/admin/modify-consumer-type-rate")
+	public ResponseEntity<String> modifyConsumerTypeRate(@RequestParam int id, @RequestParam double rate){
+		return adminService.modifyConsumerTypeRate(id, rate);
+	}
+	
+	// working
+	@PostMapping("/admin/add-helper")
+	public ResponseEntity<String> addHelper(@RequestParam String email, @RequestParam String password, @RequestParam String name) {
+		return adminService.addHelper(email, password, name);
+	}
+	
+	// working
+	@GetMapping("/admin/view-helpers")
+	public List<Helper> viewAllHelpers(){
+		return adminService.viewAllHelpers();
+	}
+	
+	// working
+	@GetMapping("/admin/view-consumer-type")
+	public List<ConsumerType> viewAllConsumerTypes(){
+		return adminService.viewAllConsumerTypes();
+	}
+	
+	// working
+	@GetMapping("/admin/view-consumers")
+	public List<Consumer> viewAllConsumers(){
+		return adminService.viewAllConsumers();
+	}
+	
+	// working
+	@PostMapping("/admin/remove-consumer")
+	public ResponseEntity<String> removeConsumer(@RequestParam String email){
+		return adminService.removeConsumer(email);
+	}
+	
 }

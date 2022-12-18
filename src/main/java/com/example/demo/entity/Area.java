@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -17,6 +19,7 @@ import javax.persistence.Table;
 public class Area {
 	@Id
 	@Column(name="area_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	private String areaName;
 	
@@ -40,6 +43,11 @@ public class Area {
 	public Area(int id, String areaName, City city) {
 		super();
 		this.id = id;
+		this.areaName = areaName;
+		this.city = city;
+	}
+	public Area(String areaName, City city) {
+		super();
 		this.areaName = areaName;
 		this.city = city;
 	}

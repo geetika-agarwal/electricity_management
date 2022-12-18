@@ -43,6 +43,17 @@ public class Consumer {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	public Consumer(String email) {
+		this.email = email;
+	}
+	
+	public Consumer(String email, String password) {
+		super();
+		this.email = email;
+		this.password = password;
+	}
+	
 	public Consumer(String email, String name, Area area, ConsumerType consumer_type, String password,
 			Set<Bill> bills) {
 		super();

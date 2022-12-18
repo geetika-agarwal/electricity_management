@@ -3,28 +3,27 @@ package com.example.demo.services;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Streamable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.entity.Admin;
 import com.example.demo.entity.Area;
 import com.example.demo.entity.City;
+import com.example.demo.entity.Consumer;
+import com.example.demo.entity.ConsumerType;
 import com.example.demo.entity.Helper;
 import com.example.demo.repositories.AdminRepository;
 import com.example.demo.repositories.AreaRepository;
+import com.example.demo.repositories.BillRepository;
 import com.example.demo.repositories.CityRepository;
+import com.example.demo.repositories.ConsumerRepository;
+import com.example.demo.repositories.ConsumerTypeRepository;
+import com.example.demo.repositories.HelperRepository;
 
 
 @Service
@@ -39,8 +38,24 @@ public class AdminService {
 	@Autowired
 	AreaRepository areaRepository;
 	
+	@Autowired 
+	ConsumerTypeRepository consumerTypeRepository;
+	
+	@Autowired 
+	HelperRepository helperRepository;
+	
+	@Autowired
+	ConsumerRepository consumerRepository;
+	
+	@Autowired
+	BillRepository billRepository;
+	
 	public void addAdmin(Admin admin) {
 		adminRepository.save(admin);
+	}
+	
+	public void addConsumerType(ConsumerType ct) {
+		consumerTypeRepository.save(ct);
 	}
 	
 	public ResponseEntity<String> addCity(City city) {
@@ -53,18 +68,22 @@ public class AdminService {
 		}
 	}
 	
-	public ResponseEntity<String> addArea(int area_id, String area_name, int city_id) {
-		if(areaRepository.existsById(area_id)) {
-			// Exception 
-			System.out.println("Area with the same ID already exists!!!");
-			return new ResponseEntity(new Exception("Area with the same ID already exists!!!").getMessage(), HttpStatus.BAD_REQUEST);
-		}else if(!(cityRepository.findById(city_id).isPresent())) {
+	public ResponseEntity<String> addArea(String area_name, String city_name) {
+		City city = null;
+		
+		for(City c: cityRepository.findAll()) {
+			if(c.getName().equalsIgnoreCase(city_name)) {
+				city = c;
+				break;
+			}
+		}
+		
+		if(city == null) {
 			// Exception 
 			return new ResponseEntity(new Exception("City Not Found").getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		else {
-			City city = getCityById(city_id).get();
-			Area area = new Area(area_id, area_name, city);
+			Area area = new Area(area_name, city);
 			areaRepository.save(area);
 			System.out.println("Area Added Successfully!!!");
 			return new ResponseEntity(new Exception("Area Added Successfully!!!").getMessage(), HttpStatus.ACCEPTED);
@@ -101,6 +120,8 @@ public class AdminService {
 				break;
 			}
 		}
+		
+		System.out.println(city);
 		
 		if(city == null) {
 			
@@ -188,16 +209,85 @@ public class AdminService {
 		}
 		
 		if(area == null) {
-			return new ResponseEntity("Area with the name not found!!! Please enter Correct Area Name", HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<String>("Area with the name not found!!! Please enter Correct Area Name", HttpStatus.EXPECTATION_FAILED);
 		}
 		
 		if(city == null) {
-			return new ResponseEntity("City with the name not found!!! Please enter Correct City Name", HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<String>("City with the name not found!!! Please enter Correct City Name", HttpStatus.EXPECTATION_FAILED);
 		}
 		
 		area.setCity(city);
 		areaRepository.save(area);
-		return new ResponseEntity("City Name Updated for that particular Area Name Successfully", HttpStatus.ACCEPTED);
+		return new ResponseEntity<String>("City Name Updated for that particular Area Name Successfully", HttpStatus.ACCEPTED);
 	}
+	
+	public ResponseEntity<String> modifyConsumerTypeRate(int id, double rate){
+		
+		for (ConsumerType ct : consumerTypeRepository.findAll()) {
+			if(ct.getId() == id) {
+				ct.setRate(rate);
+				consumerTypeRepository.save(ct);
+				return new ResponseEntity<String>("Consumer Type : " + ct.getTypeName() + "'s rate was changed to " + rate, HttpStatus.ACCEPTED);
+			}
+		}
+		return new ResponseEntity<String>("Consumer Type with " + id + " was not found.", HttpStatus.EXPECTATION_FAILED);
+	}
+	
+	public ResponseEntity<String> addHelper(String email, String password, String name) {
+		if(helperRepository.existsById(email)) {
+			return new ResponseEntity<String>("Helper with given email already exists.", HttpStatus.EXPECTATION_FAILED);
+		}
+		else {
+			Helper helper = new Helper(email, password, name);
+			helperRepository.save(helper);
+			return new ResponseEntity<String>("Helper added successfully.", HttpStatus.ACCEPTED);
+		}
+		
+	}
+	
+	public List<Helper> viewAllHelpers(){
+		return helperRepository.findAll();
+	}
+	
+	public List<ConsumerType> viewAllConsumerTypes(){
+		return consumerTypeRepository.findAll();
+	}
+	
+	public List<Consumer> viewAllConsumers(){
+		return consumerRepository.findAll();
+	}
+	
+	public ResponseEntity<String> removeConsumer(String email){
+		if(consumerRepository.findById(email).isPresent()) {
+			if((billRepository.findByEmail(new Consumer(email))).size() > 0){
+				billRepository.deleteAllByEmail(new Consumer(email));
+				consumerRepository.deleteById(email);
+				return new ResponseEntity<String>("Consumer Bills & Account Deleted successfully.", HttpStatus.ACCEPTED);
+			}else {
+				consumerRepository.deleteById(email);
+				return new ResponseEntity<String>("Consumer Deleted successfully.", HttpStatus.ACCEPTED);
+			}
+		}
+		return new ResponseEntity<String>("Consumer Not Found.", HttpStatus.BAD_REQUEST);
+	}	
+	
+	public ResponseEntity<String> addConsumer(String email, String name, String area_name, String consumer_type_name, String password) {
+		Area area = null; 
+		for (Area a : areaRepository.findAll()) {
+			if(a.getAreaName().equalsIgnoreCase(area_name))
+				area = a;
+		}
+		ConsumerType ct = null;
+		for(ConsumerType cty: consumerTypeRepository.findAll()) {
+			if(cty.getTypeName().equalsIgnoreCase(consumer_type_name))
+				ct = cty;
+		}
+		
+		Consumer consumer = new Consumer(email, name, area, ct, password, null);
+		
+		consumerRepository.save(consumer);
+		return new ResponseEntity<String>("Consumer Registered Successfully!!!", HttpStatus.ACCEPTED);
+	}
+	
 	
 }
