@@ -39,6 +39,11 @@ public class City {
 		this.name = name;
 		this.areas = areas;
 	}
+	
+	public City(String name) {
+		this.name = name;
+	}
+	
 	public int getId() {
 		return id;
 	}

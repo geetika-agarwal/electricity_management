@@ -2,9 +2,13 @@ package com.example.demo.services;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,10 +17,17 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Admin;
 import com.example.demo.entity.Area;
+import com.example.demo.entity.AreaResponse;
+import com.example.demo.entity.Bill;
+import com.example.demo.entity.BillResponse;
 import com.example.demo.entity.City;
+import com.example.demo.entity.CityResponse;
 import com.example.demo.entity.Consumer;
+import com.example.demo.entity.ConsumerResponse;
 import com.example.demo.entity.ConsumerType;
+import com.example.demo.entity.ConsumerTypeResponse;
 import com.example.demo.entity.Helper;
+import com.example.demo.entity.HelperResponse;
 import com.example.demo.repositories.AdminRepository;
 import com.example.demo.repositories.AreaRepository;
 import com.example.demo.repositories.BillRepository;
@@ -58,14 +69,10 @@ public class AdminService {
 		consumerTypeRepository.save(ct);
 	}
 	
-	public ResponseEntity<String> addCity(City city) {
-		if(cityRepository.existsById(city.getId())) {
-			// Exception 
-			return new ResponseEntity(new Exception("City with the same ID already exists!!!").getMessage(), HttpStatus.BAD_REQUEST);
-		} else {
-			cityRepository.save(city);
-			return new ResponseEntity(new Exception("City Added Successfully!!!").getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	public ResponseEntity<String> addCity(String city_name) {
+		City city = new City(city_name);
+		cityRepository.save(city);
+		return new ResponseEntity(new Exception("City Added Successfully!!!").getMessage(), HttpStatus.ACCEPTED);
 	}
 	
 	public ResponseEntity<String> addArea(String area_name, String city_name) {
@@ -90,28 +97,24 @@ public class AdminService {
 		}
 	}
 	
-	public ResponseEntity<HashMap<Integer, String>> viewAllCities() {
-		List<HashMap<Integer, String>> cities = new ArrayList<HashMap<Integer, String>>();
-		for (City city : cityRepository.findAll()) {
-			HashMap<Integer, String> map = new HashMap<Integer, String>();
-			map.put(city.getId(), city.getName());
-			cities.add(map);
+	public List<CityResponse> viewAllCities() {
+		List<CityResponse> list = new ArrayList<CityResponse>();
+		for(City c : cityRepository.findAll()) {
+			list.add(new CityResponse(c.getId(), c.getName()));
 		}
-		return new ResponseEntity(cities, HttpStatus.ACCEPTED);
+		return list;
 	}
 	
-	public ResponseEntity<HashMap<Integer, String>> viewAllAreas() {
-		List<HashMap<Integer, String>> areas = new ArrayList<HashMap<Integer, String>>();
+	public List<AreaResponse> viewAllAreas() {
+		List<AreaResponse> list = new ArrayList<AreaResponse>();
 		for (Area area : areaRepository.findAll()) {
-			HashMap<Integer, String> map = new HashMap<Integer, String>();
-			map.put(area.getId(), area.getAreaName());
-			areas.add(map);
+			list.add(new AreaResponse(area.getId(), area.getAreaName()));
 		}
-		return new ResponseEntity(areas, HttpStatus.ACCEPTED);
+		return list;
 	}
 	
-	public ResponseEntity<HashMap<Integer, String>> viewAreaByCityName(String cityName) {
-		List<HashMap<Integer, String>> areas = new ArrayList<HashMap<Integer, String>>();
+	public ResponseEntity<List<AreaResponse>> viewAreaByCityName(String cityName) {
+		List<AreaResponse> areas = new ArrayList<AreaResponse>();
 		List<City> cities = cityRepository.findAll();
 		City city = null;
 		for (City c : cities) {
@@ -120,18 +123,13 @@ public class AdminService {
 				break;
 			}
 		}
-		
-		System.out.println(city);
-		
 		if(city == null) {
-			
+			return new ResponseEntity(areas, HttpStatus.BAD_REQUEST);
 		}
 		
 		for (Area area : areaRepository.findAll()) {
-			HashMap<Integer, String> map = new HashMap<Integer, String>();
 			if(area.getCity().getId() == city.getId()) {
-				map.put(area.getId(), area.getAreaName());
-				areas.add(map);
+				areas.add(new AreaResponse(area.getId(), area.getAreaName()));
 			}
 		}
 		
@@ -245,16 +243,29 @@ public class AdminService {
 		
 	}
 	
-	public List<Helper> viewAllHelpers(){
-		return helperRepository.findAll();
+	public List<HelperResponse> viewAllHelpers(){
+		List<HelperResponse> list = new ArrayList<>();
+		for(Helper h: helperRepository.findAll()) {
+			list.add(new HelperResponse(h.getEmail(), h.getName()));
+		}
+		return list;
 	}
 	
-	public List<ConsumerType> viewAllConsumerTypes(){
-		return consumerTypeRepository.findAll();
+	public List<ConsumerTypeResponse> viewAllConsumerTypes(){
+		List<ConsumerTypeResponse> list = new ArrayList<ConsumerTypeResponse>();
+		for(ConsumerType ct: consumerTypeRepository.findAll()) {
+			list.add(new ConsumerTypeResponse(ct.getId(), ct.getTypeName(), ct.getRate()));
+		}
+		System.out.println(list);
+		return list;
 	}
 	
-	public List<Consumer> viewAllConsumers(){
-		return consumerRepository.findAll();
+	public List<ConsumerResponse> viewAllConsumers(){
+		List<ConsumerResponse> list = new ArrayList<>();
+		for(Consumer c: consumerRepository.findAll()) {
+			list.add(new ConsumerResponse(c.getEmail(), c.getName(), c.getArea().getAreaName(), c.getConsumer_type().getTypeName()));
+		}
+		return list;
 	}
 	
 	public ResponseEntity<String> removeConsumer(String email){
@@ -289,5 +300,37 @@ public class AdminService {
 		return new ResponseEntity<String>("Consumer Registered Successfully!!!", HttpStatus.ACCEPTED);
 	}
 	
-	
+	//View all Bills by passing Consumer Email
+		public List<Map<String,String>> viewAllBillsByConsumerId(String email){
+			List<Bill> records = new ArrayList<Bill>();
+			if(consumerRepository.findById(email).isPresent()) {
+				records =  billRepository.findAll().stream()
+						.filter(bill -> bill.getConsumer().getEmail().equalsIgnoreCase(email))
+						.collect(Collectors.toList());
+			}
+			List<Map<String, String>> result = new ArrayList<>();
+			for (Bill b : records) {
+				
+				Map<String, String> hm = new LinkedHashMap<>();
+				
+				hm.put("Bill Id", String.valueOf(b.getId()));
+				hm.put("email", email);
+				hm.put("billDate", String.valueOf(b.getBillDate()));
+				hm.put("UnitsConsumed", String.valueOf(b.getUnitsConsumed()));
+				hm.put("TotalAmount", String.valueOf(b.getTotalAmount()));	
+				
+				result.add(hm);
+			}
+			
+			return result;
+		}
+
+	public List<BillResponse> viewAllBills() {
+		List<BillResponse> list = new ArrayList<>();
+		for(Bill bill: billRepository.findAll()) {
+			list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
+		}
+		
+		return list;
+	}
 }

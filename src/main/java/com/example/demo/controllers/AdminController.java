@@ -2,24 +2,35 @@ package com.example.demo.controllers;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Admin;
+import com.example.demo.entity.AreaResponse;
+import com.example.demo.entity.Bill;
+import com.example.demo.entity.BillResponse;
 import com.example.demo.entity.City;
+import com.example.demo.entity.CityResponse;
 import com.example.demo.entity.Consumer;
+import com.example.demo.entity.ConsumerResponse;
 import com.example.demo.entity.ConsumerType;
+import com.example.demo.entity.ConsumerTypeResponse;
 import com.example.demo.entity.Helper;
+import com.example.demo.entity.HelperResponse;
 import com.example.demo.services.AdminService;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class AdminController {
 	
@@ -50,15 +61,15 @@ public class AdminController {
 	}
 	
 	// working
-	@PutMapping("/admin/register-consumer")
+	@PostMapping("/admin/register-consumer")
 	public ResponseEntity<String> addConsumer(@RequestParam String email, @RequestParam String name, @RequestParam String area_name, @RequestParam String consumer_type_name, @RequestParam String password) {
 		return adminService.addConsumer(email, name, area_name, consumer_type_name, password);
 	}
 	
 	// working
 	@PostMapping("/admin/add-city")
-	public void addCity(@RequestBody City city) {
-		adminService.addCity(city);
+	public ResponseEntity<String> addCity(@RequestBody City city) {
+		return adminService.addCity(city.getName());
 	}
 	
 	// working 
@@ -69,19 +80,19 @@ public class AdminController {
 	
 	// working
 	@GetMapping("/admin/city")
-	public ResponseEntity<HashMap<Integer, String>> viewCity() {
+	public List<CityResponse> viewCity() {
 		return adminService.viewAllCities();
 	}
 	
 	// working
 	@GetMapping("/admin/area")
-	public ResponseEntity<HashMap<Integer, String>> viewArea() {
+	public List<AreaResponse> viewArea() {
 		return adminService.viewAllAreas();
 	}
 	
 	// working
 	@GetMapping("/admin/area-by-city")
-	public ResponseEntity<HashMap<Integer, String>> viewAreaByCityName(@RequestParam String city) {
+	public ResponseEntity<List<AreaResponse>> viewAreaByCityName(@RequestParam String city) {
 		return adminService.viewAreaByCityName(city);
 	}
 	
@@ -123,19 +134,19 @@ public class AdminController {
 	
 	// working
 	@GetMapping("/admin/view-helpers")
-	public List<Helper> viewAllHelpers(){
+	public List<HelperResponse> viewAllHelpers(){
 		return adminService.viewAllHelpers();
 	}
 	
 	// working
 	@GetMapping("/admin/view-consumer-type")
-	public List<ConsumerType> viewAllConsumerTypes(){
+	public List<ConsumerTypeResponse> viewAllConsumerTypes(){
 		return adminService.viewAllConsumerTypes();
 	}
 	
 	// working
-	@GetMapping("/admin/view-consumers")
-	public List<Consumer> viewAllConsumers(){
+	@GetMapping("/admin/consumers")
+	public List<ConsumerResponse> viewAllConsumers(){
 		return adminService.viewAllConsumers();
 	}
 	
@@ -144,5 +155,41 @@ public class AdminController {
 	public ResponseEntity<String> removeConsumer(@RequestParam String email){
 		return adminService.removeConsumer(email);
 	}
+	
+	@GetMapping("/admin/view-bill-by-consumer-id")
+	public List<Map<String, String>> viewBillsByConsumer(@RequestParam String email){
+		return adminService.viewAllBillsByConsumerId(email);
+	}
+	
+	@GetMapping("/admin/view-all-bills")
+	public List<BillResponse> viewAllBills(){
+		return adminService.viewAllBills();
+	}
+//	
+//	//dummy - to be deleted later
+//	@GetMapping("/admin/view-bills")
+//	public List<Bill> viewBills(){
+//		return adminService.viewBills();
+//	}
+//	
+//	@GetMapping("/admin/view-bill-by-city2")
+//	public List<String> viewBillsByCity2(@RequestParam String city){
+//		return adminService.viewAllBillsByCity2(city);
+//	}
+//	
+//	@GetMapping("/admin/view-bill-by-area")
+//	public List<Map<String, String>> viewBillsByArea(@RequestParam String area){
+//		return adminService.viewAllBillsByArea(area);
+//	}
+//	
+//	@GetMapping("/admin/view-bill-by-city")
+//	public List<Map<String, String>> viewBillsByCity(@RequestParam String city){
+//		return adminService.viewAllBillsByCity(city);
+//	}
+//	
+//	@GetMapping("/admin/view-bill-by-month-and-year")
+//	public List<Map<String, String>> viewAllBillsByMonthAndYear(@RequestParam int month, @RequestParam int year){
+//		return adminService.viewAllBillsByMonthAndYear(month, year);
+//	}
 	
 }
