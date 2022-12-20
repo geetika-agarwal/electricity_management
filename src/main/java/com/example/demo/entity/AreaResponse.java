@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import org.springframework.stereotype.Component;
 
+// Class for the Area Response sent to the Angular
+
 @Component
 public class AreaResponse {
 	private int id;

@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+// POJO Class for the Bill table in the database
+
 @Entity
 public class Bill {
 	@Id

@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import org.apache.commons.codec.binary.Hex;
 
+// POJO Class of Admin
 @Entity
 @Table(name="admin")
 public class Admin {

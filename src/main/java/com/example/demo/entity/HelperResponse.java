@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import org.springframework.stereotype.Component;
 
+// Helper Response Class to send a response to the Angular
+
 @Component
 public class HelperResponse {
 	private String email;

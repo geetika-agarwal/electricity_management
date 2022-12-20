@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+// POJO Class of the Area table in the database
+
 @Entity
 @Table(name="area")
 public class Area {

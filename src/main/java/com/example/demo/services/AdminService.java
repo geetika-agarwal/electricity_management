@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.entity.Admin;
+import com.example.demo.entity.AdminResponse;
 import com.example.demo.entity.Area;
 import com.example.demo.entity.AreaResponse;
 import com.example.demo.entity.Bill;
@@ -61,30 +63,38 @@ public class AdminService {
 	@Autowired
 	BillRepository billRepository;
 	
+	/********************************Add Functionalities******************************************/
+	
+	// To add admin in the database 
 	public void addAdmin(Admin admin) {
 		adminRepository.save(admin);
 	}
 	
+	// To add consumer type in database
 	public void addConsumerType(ConsumerType ct) {
 		consumerTypeRepository.save(ct);
 	}
 	
+	// To add City in the database
 	public ResponseEntity<String> addCity(String city_name) {
+		for(City c: cityRepository.findAll()) {
+			if(c.getName().equalsIgnoreCase(city_name))
+				return new ResponseEntity(new Exception("City with same name already exists!!!").getMessage(), HttpStatus.BAD_REQUEST);
+		}
 		City city = new City(city_name);
 		cityRepository.save(city);
 		return new ResponseEntity(new Exception("City Added Successfully!!!").getMessage(), HttpStatus.ACCEPTED);
 	}
 	
+	// To add Area in the database
 	public ResponseEntity<String> addArea(String area_name, String city_name) {
 		City city = null;
-		
 		for(City c: cityRepository.findAll()) {
 			if(c.getName().equalsIgnoreCase(city_name)) {
 				city = c;
 				break;
 			}
-		}
-		
+		}		
 		if(city == null) {
 			// Exception 
 			return new ResponseEntity(new Exception("City Not Found").getMessage(), HttpStatus.BAD_REQUEST);
@@ -97,6 +107,9 @@ public class AdminService {
 		}
 	}
 	
+	/********************************View Functionalities******************************************/
+	
+	// To view all Cities
 	public List<CityResponse> viewAllCities() {
 		List<CityResponse> list = new ArrayList<CityResponse>();
 		for(City c : cityRepository.findAll()) {
@@ -105,6 +118,7 @@ public class AdminService {
 		return list;
 	}
 	
+	// To view all Areas
 	public List<AreaResponse> viewAllAreas() {
 		List<AreaResponse> list = new ArrayList<AreaResponse>();
 		for (Area area : areaRepository.findAll()) {
@@ -113,6 +127,7 @@ public class AdminService {
 		return list;
 	}
 	
+	// To view All Area by City Name
 	public ResponseEntity<List<AreaResponse>> viewAreaByCityName(String cityName) {
 		List<AreaResponse> areas = new ArrayList<AreaResponse>();
 		List<City> cities = cityRepository.findAll();
@@ -126,32 +141,100 @@ public class AdminService {
 		if(city == null) {
 			return new ResponseEntity(areas, HttpStatus.BAD_REQUEST);
 		}
-		
 		for (Area area : areaRepository.findAll()) {
 			if(area.getCity().getId() == city.getId()) {
 				areas.add(new AreaResponse(area.getId(), area.getAreaName()));
 			}
 		}
-		
 		return new ResponseEntity(areas, HttpStatus.ACCEPTED);
 	}
 	
-	public ResponseEntity<String> loginAdmin(String email, String password) {
-		if(adminRepository.findById(email).isPresent()) {
-			if(adminRepository.findById(email).get().getPassword().equals(Base64.getEncoder().encodeToString(password.getBytes()))) {
-				return new ResponseEntity("Successful Login", HttpStatus.ACCEPTED);
-			} else {
-				return new ResponseEntity("Wrong Password", HttpStatus.NOT_FOUND);
-			}
-		} else {
-			return new ResponseEntity("Invalid Credentials", HttpStatus.BAD_REQUEST);
+	// To view all Helpers 
+	public List<HelperResponse> viewAllHelpers(){
+		List<HelperResponse> list = new ArrayList<>();
+		for(Helper h: helperRepository.findAll()) {
+			list.add(new HelperResponse(h.getEmail(), h.getName()));
 		}
+		return list;
 	}
 	
-	public Optional<City> getCityById(int city_id) {
-		return cityRepository.findById(city_id);
+	// To view All Consumer Types
+	public List<ConsumerTypeResponse> viewAllConsumerTypes(){
+		List<ConsumerTypeResponse> list = new ArrayList<ConsumerTypeResponse>();
+		for(ConsumerType ct: consumerTypeRepository.findAll()) {
+			list.add(new ConsumerTypeResponse(ct.getId(), ct.getTypeName(), ct.getRate()));
+		}
+		System.out.println(list);
+		return list;
 	}
 	
+	// To view All Consumers
+	public List<ConsumerResponse> viewAllConsumers(){
+		List<ConsumerResponse> list = new ArrayList<>();
+		for(Consumer c: consumerRepository.findAll()) {
+			list.add(new ConsumerResponse(c.getEmail(), c.getName(), c.getArea().getAreaName(), c.getConsumer_type().getTypeName()));
+		}
+		return list;
+	}
+	
+	// To view All Bills
+	public List<BillResponse> viewAllBills() {
+		List<BillResponse> list = new ArrayList<>();
+		for(Bill bill: billRepository.findAll()) {
+			list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
+		}
+		
+		return list;
+	}
+	
+	// To view all the bills based on consumer's email
+	public List<BillResponse> viewAllBillsByCid(String email) {
+		List<BillResponse> list = new ArrayList<>();
+		for(Bill bill: billRepository.findAll()) {
+			if(bill.getConsumer().getEmail().equals(email)) {
+				list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
+			}
+		}
+		System.out.println();
+		return list;
+	}
+	
+	// To view all the bills based on month and year
+	public List<BillResponse> viewAllBillsByMnY(String month, int year) {
+		List<BillResponse> list = new ArrayList<>();
+		for(Bill bill: billRepository.findAll()) {
+			if(bill.getBillDate().toLocaleString().contains(month) && bill.getBillDate().toString().contains(String.valueOf(year))) {
+				list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
+			}
+		}
+		return list;
+	}
+	
+	// To view all bills based on city
+	public List<BillResponse> viewAllBillsByCity(String city) {
+		List<BillResponse> list = new ArrayList<>();
+		for(Bill bill: billRepository.findAll()) {
+			if(bill.getConsumer().getArea().getCity().getName().equalsIgnoreCase(city)) {
+				list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
+			}
+		}
+		return list;
+	}
+	
+	// To view all the bills based on area
+	public List<BillResponse> viewAllBillsByArea(String area) {
+		List<BillResponse> list = new ArrayList<>();
+		for(Bill bill: billRepository.findAll()) {
+			if(bill.getConsumer().getArea().getAreaName().equalsIgnoreCase(area)) {
+				list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
+			}
+		}
+		System.out.println(list);
+		return list;
+	}
+	/********************************Modify Functionalities******************************************/
+	
+	// to modify city name
 	public ResponseEntity<String> modifyCity(String cityName, String newCityName) {
 		City city = null;
 		for(City c: cityRepository.findAll()) {
@@ -170,6 +253,7 @@ public class AdminService {
 		}
 	}
 	
+	// to modify area name
 	public ResponseEntity<String> modifyAreaName(String areaName, String newAreaName) {
 		Area area = null;
 		for(Area a: areaRepository.findAll()) {
@@ -188,6 +272,7 @@ public class AdminService {
 		}
 	}
 	
+	// to modify area's city
 	public ResponseEntity<String> modifyAreaByCityName(String areaName, String newCityName) {
 		City city = null;
 		Area area = null;
@@ -204,133 +289,43 @@ public class AdminService {
 				city = c;
 				break;
 			}
-		}
-		
-		if(area == null) {
-			return new ResponseEntity<String>("Area with the name not found!!! Please enter Correct Area Name", HttpStatus.EXPECTATION_FAILED);
-		}
-		
-		if(city == null) {
-			return new ResponseEntity<String>("City with the name not found!!! Please enter Correct City Name", HttpStatus.EXPECTATION_FAILED);
-		}
-		
+		}		
 		area.setCity(city);
 		areaRepository.save(area);
 		return new ResponseEntity<String>("City Name Updated for that particular Area Name Successfully", HttpStatus.ACCEPTED);
 	}
 	
-	public ResponseEntity<String> modifyConsumerTypeRate(int id, double rate){
+	// To modify rate for a particular consumer type
+	public ResponseEntity<String> modifyConsumerTypeRate(String name, double rate){
 		
 		for (ConsumerType ct : consumerTypeRepository.findAll()) {
-			if(ct.getId() == id) {
+			if(ct.getTypeName().equalsIgnoreCase(name)) {
 				ct.setRate(rate);
 				consumerTypeRepository.save(ct);
 				return new ResponseEntity<String>("Consumer Type : " + ct.getTypeName() + "'s rate was changed to " + rate, HttpStatus.ACCEPTED);
 			}
 		}
-		return new ResponseEntity<String>("Consumer Type with " + id + " was not found.", HttpStatus.EXPECTATION_FAILED);
+		return new ResponseEntity<String>("Consumer Type " + name + " was not found.", HttpStatus.EXPECTATION_FAILED);
 	}
 	
-	public ResponseEntity<String> addHelper(String email, String password, String name) {
-		if(helperRepository.existsById(email)) {
-			return new ResponseEntity<String>("Helper with given email already exists.", HttpStatus.EXPECTATION_FAILED);
-		}
-		else {
-			Helper helper = new Helper(email, password, name);
-			helperRepository.save(helper);
-			return new ResponseEntity<String>("Helper added successfully.", HttpStatus.ACCEPTED);
-		}
-		
-	}
+	/********************************Login Functionalities******************************************/
 	
-	public List<HelperResponse> viewAllHelpers(){
-		List<HelperResponse> list = new ArrayList<>();
-		for(Helper h: helperRepository.findAll()) {
-			list.add(new HelperResponse(h.getEmail(), h.getName()));
-		}
-		return list;
-	}
-	
-	public List<ConsumerTypeResponse> viewAllConsumerTypes(){
-		List<ConsumerTypeResponse> list = new ArrayList<ConsumerTypeResponse>();
-		for(ConsumerType ct: consumerTypeRepository.findAll()) {
-			list.add(new ConsumerTypeResponse(ct.getId(), ct.getTypeName(), ct.getRate()));
-		}
-		System.out.println(list);
-		return list;
-	}
-	
-	public List<ConsumerResponse> viewAllConsumers(){
-		List<ConsumerResponse> list = new ArrayList<>();
-		for(Consumer c: consumerRepository.findAll()) {
-			list.add(new ConsumerResponse(c.getEmail(), c.getName(), c.getArea().getAreaName(), c.getConsumer_type().getTypeName()));
-		}
-		return list;
-	}
-	
-	public ResponseEntity<String> removeConsumer(String email){
-		if(consumerRepository.findById(email).isPresent()) {
-			if((billRepository.findByEmail(new Consumer(email))).size() > 0){
-				billRepository.deleteAllByEmail(new Consumer(email));
-				consumerRepository.deleteById(email);
-				return new ResponseEntity<String>("Consumer Bills & Account Deleted successfully.", HttpStatus.ACCEPTED);
-			}else {
-				consumerRepository.deleteById(email);
-				return new ResponseEntity<String>("Consumer Deleted successfully.", HttpStatus.ACCEPTED);
+	// To Login Admin
+	public ResponseEntity<String> loginAdmin(String email, String password) {
+		if(adminRepository.findById(email).isPresent()) {
+			if(adminRepository.findById(email).get().getPassword().equals(Base64.getEncoder().encodeToString(password.getBytes()))) {
+				return new ResponseEntity("Successful Login", HttpStatus.ACCEPTED);
+			} else {
+				return new ResponseEntity("Wrong Password", HttpStatus.NOT_FOUND);
 			}
+		} else {
+			return new ResponseEntity("Invalid Credentials", HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<String>("Consumer Not Found.", HttpStatus.BAD_REQUEST);
-	}	
-	
-	public ResponseEntity<String> addConsumer(String email, String name, String area_name, String consumer_type_name, String password) {
-		Area area = null; 
-		for (Area a : areaRepository.findAll()) {
-			if(a.getAreaName().equalsIgnoreCase(area_name))
-				area = a;
-		}
-		ConsumerType ct = null;
-		for(ConsumerType cty: consumerTypeRepository.findAll()) {
-			if(cty.getTypeName().equalsIgnoreCase(consumer_type_name))
-				ct = cty;
-		}
-		
-		Consumer consumer = new Consumer(email, name, area, ct, password, null);
-		
-		consumerRepository.save(consumer);
-		return new ResponseEntity<String>("Consumer Registered Successfully!!!", HttpStatus.ACCEPTED);
 	}
 	
-	//View all Bills by passing Consumer Email
-		public List<Map<String,String>> viewAllBillsByConsumerId(String email){
-			List<Bill> records = new ArrayList<Bill>();
-			if(consumerRepository.findById(email).isPresent()) {
-				records =  billRepository.findAll().stream()
-						.filter(bill -> bill.getConsumer().getEmail().equalsIgnoreCase(email))
-						.collect(Collectors.toList());
-			}
-			List<Map<String, String>> result = new ArrayList<>();
-			for (Bill b : records) {
-				
-				Map<String, String> hm = new LinkedHashMap<>();
-				
-				hm.put("Bill Id", String.valueOf(b.getId()));
-				hm.put("email", email);
-				hm.put("billDate", String.valueOf(b.getBillDate()));
-				hm.put("UnitsConsumed", String.valueOf(b.getUnitsConsumed()));
-				hm.put("TotalAmount", String.valueOf(b.getTotalAmount()));	
-				
-				result.add(hm);
-			}
-			
-			return result;
-		}
-
-	public List<BillResponse> viewAllBills() {
-		List<BillResponse> list = new ArrayList<>();
-		for(Bill bill: billRepository.findAll()) {
-			list.add(new BillResponse(bill.getId(), bill.getConsumer().getEmail(), bill.getConsumer().getArea().getCity().getName(), bill.getConsumer().getArea().getAreaName(), bill.getBillDate(), bill.getUnitsConsumed(), bill.getTotalAmount()));
-		}
-		
-		return list;
+	public Optional<City> getCityById(int city_id) {
+		return cityRepository.findById(city_id);
 	}
+	
+	
 }

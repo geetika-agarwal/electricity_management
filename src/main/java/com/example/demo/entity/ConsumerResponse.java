@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import org.springframework.stereotype.Component;
 
+// Consumer Class for sending as a response to the Angular
+
 @Component
 public class ConsumerResponse {
 

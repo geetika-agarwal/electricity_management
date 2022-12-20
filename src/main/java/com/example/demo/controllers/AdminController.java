@@ -37,7 +37,7 @@ public class AdminController {
 	@Autowired
 	AdminService adminService;
 	
-	// working
+	// Adding Admin to the Database. Hard coded directly
 	@GetMapping("/admin/add-admin")
 	public void addAdmin() {
 		Admin admin1 = new Admin("admin1@gmail.com", "admin@1", "Admin 1");
@@ -49,6 +49,7 @@ public class AdminController {
 		adminService.addAdmin(admin3);
 	}
 	
+	// Adding Consumer Type to the Database. Hard Coded directly
 	@PutMapping("/admin/add-consumer-type")
 	public void addConsumerType() {
 		ConsumerType ct1 = new ConsumerType(1, "Commercial", 8.24);
@@ -60,31 +61,25 @@ public class AdminController {
 		adminService.addConsumerType(ct3);
 	}
 	
-	// working
-	@PostMapping("/admin/register-consumer")
-	public ResponseEntity<String> addConsumer(@RequestParam String email, @RequestParam String name, @RequestParam String area_name, @RequestParam String consumer_type_name, @RequestParam String password) {
-		return adminService.addConsumer(email, name, area_name, consumer_type_name, password);
+	// End point to add a city into database
+	@GetMapping("/admin/add-city")
+	public ResponseEntity<String> addCity(@RequestParam String name) {
+		return adminService.addCity(name);
 	}
 	
-	// working
-	@PostMapping("/admin/add-city")
-	public ResponseEntity<String> addCity(@RequestBody City city) {
-		return adminService.addCity(city.getName());
+	// End point to add area to the database 
+	@GetMapping("/admin/add-area")
+	public ResponseEntity<String> addArea(@RequestParam String areaname, @RequestParam String cityname) {
+		return adminService.addArea(areaname, cityname);
 	}
 	
-	// working 
-	@PostMapping("/admin/add-area")
-	public ResponseEntity<String> addArea(@RequestParam String area_name, @RequestParam String city_name) {
-		return adminService.addArea(area_name, city_name);
-	}
-	
-	// working
+	// End point to view all  cities present in the database
 	@GetMapping("/admin/city")
 	public List<CityResponse> viewCity() {
 		return adminService.viewAllCities();
 	}
 	
-	// working
+	// End point to view all areas present in the database
 	@GetMapping("/admin/area")
 	public List<AreaResponse> viewArea() {
 		return adminService.viewAllAreas();
@@ -96,100 +91,81 @@ public class AdminController {
 		return adminService.viewAreaByCityName(city);
 	}
 	
-	// working
+	// end point used for login of the admin
 	@GetMapping("/admin/login") 
 	public ResponseEntity<String> adminLogin(@RequestParam String email, @RequestParam String password){
 		return adminService.loginAdmin(email, password);
 	}
 	
-	// working	
-	@PutMapping("/admin/modify-city")
+	// end point to modify the city name in the database to a new city name	
+	@GetMapping("/admin/modify-city")
 	public ResponseEntity<String> modifyCity(@RequestParam String cityName, @RequestParam String newCityName) {
 		return adminService.modifyCity(cityName, newCityName);
 	}
 	
-	// working
+	// end point to modify the area name in the database to a new area name
 	@PutMapping("/admin/modify-area")
 	public ResponseEntity<String> modifyAreaName(@RequestParam String areaName, @RequestParam String newAreaName) {
 		return adminService.modifyAreaName(areaName, newAreaName);
 	}
 	
-	// working
-	@PutMapping("/admin/modify-area-city")
+	// end point to modify the city for a particular area using area's name
+	@GetMapping("/admin/modify-area-city")
 	public ResponseEntity<String> modifyAreaByCityName(@RequestParam String areaName, @RequestParam String newCityName) {
 		return adminService.modifyAreaByCityName(areaName, newCityName);
 	}
 	
-	// working
-	@PutMapping("/admin/modify-consumer-type-rate")
-	public ResponseEntity<String> modifyConsumerTypeRate(@RequestParam int id, @RequestParam double rate){
-		return adminService.modifyConsumerTypeRate(id, rate);
+	// end point to modify the consumer type's rate
+	@GetMapping("/admin/modify-consumer-type-rate")
+	public ResponseEntity<String> modifyConsumerTypeRate(@RequestParam String typeName, @RequestParam double rate){
+		return adminService.modifyConsumerTypeRate(typeName, rate);
 	}
 	
-	// working
-	@PostMapping("/admin/add-helper")
-	public ResponseEntity<String> addHelper(@RequestParam String email, @RequestParam String password, @RequestParam String name) {
-		return adminService.addHelper(email, password, name);
-	}
-	
-	// working
+	// end point to view all helpers
 	@GetMapping("/admin/view-helpers")
 	public List<HelperResponse> viewAllHelpers(){
 		return adminService.viewAllHelpers();
 	}
 	
-	// working
+	// end point to view all consumer types
 	@GetMapping("/admin/view-consumer-type")
 	public List<ConsumerTypeResponse> viewAllConsumerTypes(){
 		return adminService.viewAllConsumerTypes();
 	}
 	
-	// working
+	// end point to view all consumers
 	@GetMapping("/admin/consumers")
 	public List<ConsumerResponse> viewAllConsumers(){
 		return adminService.viewAllConsumers();
 	}
 	
-	// working
-	@PostMapping("/admin/remove-consumer")
-	public ResponseEntity<String> removeConsumer(@RequestParam String email){
-		return adminService.removeConsumer(email);
-	}
-	
-	@GetMapping("/admin/view-bill-by-consumer-id")
-	public List<Map<String, String>> viewBillsByConsumer(@RequestParam String email){
-		return adminService.viewAllBillsByConsumerId(email);
-	}
-	
+	// end point to view all bills
 	@GetMapping("/admin/view-all-bills")
 	public List<BillResponse> viewAllBills(){
 		return adminService.viewAllBills();
 	}
-//	
-//	//dummy - to be deleted later
-//	@GetMapping("/admin/view-bills")
-//	public List<Bill> viewBills(){
-//		return adminService.viewBills();
-//	}
-//	
-//	@GetMapping("/admin/view-bill-by-city2")
-//	public List<String> viewBillsByCity2(@RequestParam String city){
-//		return adminService.viewAllBillsByCity2(city);
-//	}
-//	
-//	@GetMapping("/admin/view-bill-by-area")
-//	public List<Map<String, String>> viewBillsByArea(@RequestParam String area){
-//		return adminService.viewAllBillsByArea(area);
-//	}
-//	
-//	@GetMapping("/admin/view-bill-by-city")
-//	public List<Map<String, String>> viewBillsByCity(@RequestParam String city){
-//		return adminService.viewAllBillsByCity(city);
-//	}
-//	
-//	@GetMapping("/admin/view-bill-by-month-and-year")
-//	public List<Map<String, String>> viewAllBillsByMonthAndYear(@RequestParam int month, @RequestParam int year){
-//		return adminService.viewAllBillsByMonthAndYear(month, year);
-//	}
+
+	// end point to view all bills by consumer's email
+	@GetMapping("/admin/view-bill-by-cid")
+	public List<BillResponse> viewBillsByCid(@RequestParam String email){
+		return adminService.viewAllBillsByCid(email);
+	}
 	
+	// end point to view all bills by month and year of the bill date
+	@GetMapping("/admin/view-bill-by-mny")
+	public List<BillResponse> viewAllBillsByMonthAndYear(@RequestParam String month, @RequestParam int year){
+		return adminService.viewAllBillsByMnY(month, year);
+	}
+	
+	// end point to view bills by city of the consumer
+	@GetMapping("/admin/view-bill-by-city")
+	public List<BillResponse> viewAllBillsByCity(@RequestParam String city){
+		return adminService.viewAllBillsByCity(city);
+	}
+	
+	// end point to view bills by area of the consumer
+	@GetMapping("/admin/view-bill-by-area")
+	public List<BillResponse> viewAllBillsByArea(@RequestParam String area){
+		return adminService.viewAllBillsByArea(area);
+	}
 }

@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+// POJO Class for Consumer Type Table in Database
+
 @Entity
 public class ConsumerType {
 	@Id

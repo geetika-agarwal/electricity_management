@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import org.springframework.stereotype.Component;
 
+// City Class to send as a response to Angular
+
 @Component
 public class CityResponse {
 	private int id;

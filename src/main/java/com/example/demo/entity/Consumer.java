@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+// POJO Class for Consumer Table in Database
 
 @Entity()
 public class Consumer {

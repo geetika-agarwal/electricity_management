@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Area;
+import com.example.demo.entity.Bill;
 import com.example.demo.entity.Consumer;
 import com.example.demo.entity.ConsumerType;
 import com.example.demo.repositories.AreaRepository;
@@ -30,7 +31,8 @@ public class ConsumerService {
 	@Autowired
 	BillRepository billRepository;
 	
-	public void registration(String email, String name, String area_name, String consumer_type_name, String password) {
+	// Rogister Consumer
+	public ResponseEntity<String> registration(String email, String name, String area_name, String consumer_type_name, String password) {
 		Area area = null; 
 		for (Area a : areaRepository.findAll()) {
 			if(a.getAreaName().equalsIgnoreCase(area_name))
@@ -41,15 +43,18 @@ public class ConsumerService {
 			if(cty.getTypeName().equalsIgnoreCase(consumer_type_name))
 				ct = cty;
 		}
-		
+		if(consumerRepository.existsById(email)) {
+			return new ResponseEntity<String>("Consumer With same email Already present", HttpStatus.BAD_REQUEST);
+		}
 		Consumer consumer = new Consumer(email, name, area, ct, password, null);
-		
 		consumerRepository.save(consumer);
+		return new ResponseEntity<String>("Successful Registration!!!", HttpStatus.ACCEPTED);
 	}
 	
-	public ResponseEntity<String> consumerLogin(Consumer consumer) {
-		if(consumerRepository.findById(consumer.getEmail()).isPresent()) {
-			if(consumerRepository.findById(consumer.getEmail()).get().getPassword().equals(Base64.getEncoder().encodeToString(consumer.getPassword().getBytes()))) {
+	// Login Consumer
+	public ResponseEntity<String> consumerLogin(String email, String password) {
+		if(consumerRepository.findById(email).isPresent()) {
+			if(consumerRepository.findById(email).get().getPassword().equals(Base64.getEncoder().encodeToString(password.getBytes()))) {
 				System.out.println("Successful Login");
 				return new ResponseEntity<String>("Successful Login", HttpStatus.ACCEPTED);
 			} else {
@@ -58,6 +63,44 @@ public class ConsumerService {
 		}else {
 			return new ResponseEntity<String>("Invalid Email/ Password", HttpStatus.UNAUTHORIZED);
 		}
+	}
+	
+	// Delete Consumer
+	public ResponseEntity<String> removeAccount(String email){
+		if(consumerRepository.findById(email).isPresent()) {
+			for(Bill bill: billRepository.findAll()) {
+				if(bill.getConsumer().getEmail().equalsIgnoreCase(email)) {
+					billRepository.deleteById(bill.getId());
+				}
+			}
+			consumerRepository.deleteById(email);
+			return new ResponseEntity<String>("Your Bills & Account Deleted successfully.", HttpStatus.ACCEPTED);
+		}
+		return new ResponseEntity<String>("You are not logged in. Log In First", HttpStatus.BAD_REQUEST);
+	}
+	
+	// Update Consumer Name
+	public ResponseEntity<String> updateName(String email, String name){
+		for (Consumer c : consumerRepository.findAll()) {
+			if(c.getEmail().equals(email)) {
+				c.setName(name);
+				consumerRepository.save(c);
+				return new ResponseEntity<String>("Consumer Name was changed." , HttpStatus.ACCEPTED);
+			}
+		}
+		return new ResponseEntity<String>("You are not logged in. Please Log In.", HttpStatus.NOT_FOUND);
+	}
+	
+	// Update Consumer Password
+	public ResponseEntity<String> updatePassword(String email, String password){
+		for (Consumer c : consumerRepository.findAll()) {
+			if(c.getEmail().equals(email)) {
+				c.setPassword(password);
+				consumerRepository.save(c);
+				return new ResponseEntity<String>("Consumer Password was changed." , HttpStatus.ACCEPTED);
+			}
+		}
+		return new ResponseEntity<String>("You are not logged in. Please Log In.", HttpStatus.NOT_FOUND);
 	}
 	
 }

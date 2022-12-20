@@ -1,17 +1,11 @@
 package com.example.demo.entity;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.apache.commons.codec.binary.Hex;
+// POJO Class for Helper Table in the Database 
 
 @Entity
 public class Helper {

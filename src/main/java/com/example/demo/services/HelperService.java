@@ -30,10 +30,11 @@ public class HelperService{
 	public void addHelper(Helper helper) {
 		helperRepository.save(helper);
 	}
-
+	
+	// To login Helper
 	public ResponseEntity<String> loginHelper(String email, String password) {
 		if(helperRepository.findById(email).isPresent()) {
-			if(helperRepository.findById(email).get().getPassword().equals(password)) {
+			if(helperRepository.findById(email).get().getPassword().equals(Base64.getEncoder().encodeToString(password.getBytes()))) {
 				return new ResponseEntity("Successful Login", HttpStatus.ACCEPTED);
 			} else {
 				return new ResponseEntity("Wrong Password", HttpStatus.NOT_FOUND);
@@ -43,6 +44,7 @@ public class HelperService{
 		}
 	}
 	
+	// To add Bill
 	public ResponseEntity<String> addBill(String email, Integer units){
 		Double rate = consumerRepository.findById(email).get().getConsumer_type().getRate();
 		Double totalAmount = rate * units;

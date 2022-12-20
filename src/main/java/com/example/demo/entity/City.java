@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+// POJO class for Bill Table in Database
+
 @Entity
 public class City {
 	@Id

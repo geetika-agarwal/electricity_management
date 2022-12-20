@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import org.springframework.stereotype.Component;
 
+
+// POJO CLass for Admin Responses sent to Angular
 @Component
 public class AdminResponse {
 	public String getEmail() {

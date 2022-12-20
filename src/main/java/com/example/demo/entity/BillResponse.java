@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
+// Bill Class to send as a Response to Angular
+
 @Component
 public class BillResponse {
 	private int bill_id;
@@ -27,6 +29,12 @@ public class BillResponse {
 		this.date = date;
 		this.units = units;
 		this.amount = amount;
+	}
+
+	@Override
+	public String toString() {
+		return "BillResponse [bill_id=" + bill_id + ", email=" + email + ", city=" + city + ", area=" + area + ", date="
+				+ date + ", units=" + units + ", amount=" + amount + "]";
 	}
 
 	public int getBill_id() {
