@@ -45,10 +45,11 @@ public class Consumer {
 		// TODO Auto-generated constructor stub
 	}
 	
+	// constructor of one argument
 	public Consumer(String email) {
 		this.email = email;
 	}
-	
+	// constructor of two argument
 	public Consumer(String email, String password) {
 		super();
 		this.email = email;

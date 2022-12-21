@@ -151,7 +151,7 @@ public class AdminController {
 		return adminService.viewAllBillsByCid(email);
 	}
 	
-	// end point to view all bills by month and year of the bill date
+	// End point to view all bills by month and year of the bill date
 	@GetMapping("/admin/view-bill-by-mny")
 	public List<BillResponse> viewAllBillsByMonthAndYear(@RequestParam String month, @RequestParam int year){
 		return adminService.viewAllBillsByMnY(month, year);

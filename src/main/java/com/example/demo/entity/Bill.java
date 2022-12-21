@@ -15,14 +15,14 @@ import javax.persistence.ManyToOne;
 public class Bill {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private int id;	//Bill id
 	
 	@ManyToOne
 	@JoinColumn(name="consumer")
 	private Consumer consumer;
 	
 	private Date billDate;
-	private int unitsConsumed;
+	private int unitsConsumed; //units consumed by the consumer
 	private double totalAmount;
 	public Bill() {
 		super();

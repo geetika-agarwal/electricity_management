@@ -22,13 +22,13 @@ public class HelperController {
 	@Autowired(required = true)
 	HelperService helperService;
 	
-	// end point used for login of the helper
+	// End point used for login of the helper
 	@GetMapping("/helper/login")
 	public ResponseEntity<String> helperLogin(@RequestParam String email, @RequestParam String password) {
 		return helperService.loginHelper(email, password);
 	}
 	
-	// end point to add bills to the database by the helper using consumer's email
+	// End point to add bills to the database by the helper using consumer's email
 	@GetMapping("/helper/home")
 	public ResponseEntity<String> addBill(@RequestParam String email, @RequestParam Integer units){
 		return helperService.addBill(email, units);
