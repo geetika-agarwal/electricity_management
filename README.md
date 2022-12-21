@@ -5,10 +5,10 @@
 ### Technology used
 <li>Spring Core</li>
 <li>Spring Data JPA</li>
-
-
 <li>Spring Boot </li>
 <li>Hiberante </li>
+<li>Mockito Testing </li>
+<li>J Unit Testing </li>
 <li> MySQL </li>
 <li> Angular </li>
 
@@ -19,5 +19,3 @@
 <li> MySQL WorkBench </li>
 <li> Github </li>
 <li> Jira </li>
-
-
