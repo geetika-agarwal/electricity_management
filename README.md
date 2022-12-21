@@ -19,3 +19,7 @@
 <li> MySQL WorkBench </li>
 <li> Github </li>
 <li> Jira </li>
+
+### Online Resources Used
+<li>Database Schema Designer: https://app.dbdesigner.net/designer/schema/581816</li>
+<li>Inculcation of Database relationships in spring boot:  http://www.javapoint.com/jpa-one-to-many-mapping </li>
