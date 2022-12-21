@@ -14,11 +14,12 @@ import com.example.demo.entity.Consumer;
 @Repository
 @Component
 public interface BillRepository extends JpaRepository<Bill, Integer>{
+	// sql query for delete bill
 	@Modifying
 	@Query("DELETE Bill b WHERE b.consumer = :consumer")
 	int deleteAllByEmail(Consumer consumer);
 	
-	
+	// sql query for getting bill
 	@Query("SELECT b FROM Bill b WHERE b.consumer = :consumer")
 	List<Bill> findByEmail(Consumer consumer);
 }
