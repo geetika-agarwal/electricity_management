@@ -63,6 +63,18 @@ public class AdminService {
 	@Autowired
 	BillRepository billRepository;
 	
+	public AdminService(ConsumerRepository consumerRepository2, AreaRepository areaRepository2,
+			CityRepository cityRepository2, ConsumerTypeRepository consumerTypeRepository2,
+			HelperRepository helperRepository2, BillRepository billRepository2, AdminRepository adminRepository2) {
+		this.consumerRepository = consumerRepository2;
+		this.areaRepository = areaRepository2;
+		this.cityRepository = cityRepository2;
+		this.consumerTypeRepository = consumerTypeRepository2;
+		this.helperRepository = helperRepository2;
+		this.billRepository = billRepository2;
+		this.adminRepository = adminRepository2;
+	}
+	
 	/********************************Add Functionalities******************************************/
 	
 	// To add admin in the database 
@@ -87,25 +99,21 @@ public class AdminService {
 	}
 	
 	// To add Area in the database
-	public ResponseEntity<String> addArea(String area_name, String city_name) {
-		City city = null;
-		for(City c: cityRepository.findAll()) {
-			if(c.getName().equalsIgnoreCase(city_name)) {
-				city = c;
-				break;
+		public ResponseEntity<String> addArea(String area_name, String city_name) {
+			City city = cityRepository.findByCity(city_name);
+			
+			for(Area area: areaRepository.findAll()) {
+				if(area.getAreaName().equalsIgnoreCase(area_name))
+					return new ResponseEntity(new Exception("Area with same name already present!!!").getMessage(), HttpStatus.BAD_REQUEST);
 			}
-		}		
-		if(city == null) {
-			// Exception 
-			return new ResponseEntity(new Exception("City Not Found").getMessage(), HttpStatus.BAD_REQUEST);
-		}
-		else {
+			
 			Area area = new Area(area_name, city);
 			areaRepository.save(area);
 			System.out.println("Area Added Successfully!!!");
 			return new ResponseEntity(new Exception("Area Added Successfully!!!").getMessage(), HttpStatus.ACCEPTED);
+
 		}
-	}
+
 	
 	/********************************View Functionalities******************************************/
 	

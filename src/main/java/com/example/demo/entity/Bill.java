@@ -35,8 +35,17 @@ public class Bill {
 		this.unitsConsumed = unitsConsumed;
 		this.totalAmount = totalAmount;
 	}
+	
 	public int getId() {
 		return id;
+	}
+	public Bill(int id, Consumer consumer, Date billDate, int unitsConsumed, double totalAmount) {
+		super();
+		this.id = id;
+		this.consumer = consumer;
+		this.billDate = billDate;
+		this.unitsConsumed = unitsConsumed;
+		this.totalAmount = totalAmount;
 	}
 	public void setId(int id) {
 		this.id = id;

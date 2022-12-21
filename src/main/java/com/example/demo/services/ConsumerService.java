@@ -31,7 +31,14 @@ public class ConsumerService {
 	@Autowired
 	BillRepository billRepository;
 	
-	// Rogister Consumer
+	public ConsumerService(ConsumerRepository consumerRepository2, AreaRepository areaRepository2,
+			ConsumerTypeRepository consumerTypeRepository2) {
+		this.consumerRepository = consumerRepository2;
+		this.areaRepository = areaRepository2;
+		this.consumerTypeRepository = consumerTypeRepository2;
+	}
+	
+	// Register Consumer
 	public ResponseEntity<String> registration(String email, String name, String area_name, String consumer_type_name, String password) {
 		Area area = null; 
 		for (Area a : areaRepository.findAll()) {
