@@ -91,7 +91,7 @@ public class ConsumerService {
 		return new ResponseEntity<String>("You are not logged in. Please Log In.", HttpStatus.NOT_FOUND);
 	}
 	
-	// Update Consumer Password
+	// Update Consumer Password Using Email
 	public ResponseEntity<String> updatePassword(String email, String password){
 		for (Consumer c : consumerRepository.findAll()) {
 			if(c.getEmail().equals(email)) {
