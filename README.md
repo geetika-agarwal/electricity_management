@@ -1,6 +1,11 @@
 # Electricity Management System
 
 <hr>
+### Technology used
+<li>Spring Core</li>
+<li>Spring Data JPA</li>
+
+
 <li>Spring Boot </li>
 <li>Hiberante </li>
 <li> MySQL </li>
